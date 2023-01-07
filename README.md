@@ -25,7 +25,7 @@ Install them from [pub.dev] or just use:
   $ flutter pub get sqflite
   $ flutter pub get path_provider
   ```
-[dependencies]: https://github.com/SirioRigel/flutter-databse-helper/edit/main/README.md#dependencies
+[dependencies]: https://github.com/SirioRigel/flutter-databse-helper/tree/testBranch#dependencies
 [sqflite]: https://pub.dev/packages/sqflite
 [path_provider]: https://pub.dev/packages/path_provider
 [pub.dev]: https://pub.dev
