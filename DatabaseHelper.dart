@@ -33,7 +33,7 @@ class DatabaseHelper{
       CREATE TABLE water(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         waterDrunk INTEGER,
-        dailywater INTEGER
+        dailyWater INTEGER
       )
     ''');
   }
