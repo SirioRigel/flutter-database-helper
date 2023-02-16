@@ -37,7 +37,7 @@ Note how the await keyword is **required** because we are calling an external to
     dailyWater: 2500
   );
   int id = 0;
-  DatabaseHelper.instance.Update(w, id); // New value for waterDrunk = 1500;
+  DatabaseHelper.instance.UpdateWater(w, id); // New value for waterDrunk = 1500;
 ```
 
 ### Remove an object
