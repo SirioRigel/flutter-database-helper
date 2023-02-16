@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import "package:sqflite/sqflite.dart";
+import 'main.dart';
 
 // This class will be used to create the database
 class DatabaseHelper{
@@ -33,17 +34,18 @@ class DatabaseHelper{
       CREATE TABLE water(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         waterDrunk INTEGER,
-        dailywater INTEGER
+        dailyWater INTEGER,
+        date TEXT
       )
     ''');
   }
 
-  Future<List<Water>> GetTable() async {
+  Future<List<Water>> GetWaterTable() async {
     // Grabbing the database from the constructor
     Database db = await instance.database;
 
     // Here you can retrieve a table whose values will be converted
-    // To the Object type specified in the method declaration
+    // To the Water type specified in the method declaration
     // It's possible to order it through a set of commands such as
     // groupBy, orderBy, where...
     var objects = await db.query("water", orderBy: "id");
@@ -66,22 +68,8 @@ class DatabaseHelper{
     return await db.insert("water", wtr.toMap());
   }
 
-  Future CreateTable(String name) async{
-    // Grabbing the database
-    Database db = await instance.database;
-
-    // Creates a table with a specific name
-    return await db.execute('''
-      CREATE TABLE water(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        waterDrunk INTEGER,
-        dailywater INTEGER
-      )
-    ''');
-  }
-
-  // Remove an object from the database
-  Future<int> Remove(int id) async {
+  // Remove an object from a specific table in the database
+  Future<int> RemoveWater(int id) async {
     // Grabbing the database
     Database db = await instance.database;
 
@@ -93,19 +81,32 @@ class DatabaseHelper{
   Future DeleteTable(String name) async{
     // Grabbing the database
     Database db = await instance.database;
-
     // Deletes a table with a specific name
     return await db.execute("DROP TABLE $name");
   }
 
   // Update an object in the database
-  Future<int> Update(Water wtr, int id) async {
+  Future<int> UpdateWater(Water wtr, int id) async {
     // Grabbing the database
     Database db = await instance.database;
 
     // We update an object calling .update and by mapping the object we
     // updated into the database and specifying the id we want to change
-    return await db.update("water", wtr.toMap(), where: "id = ?", whereArgs: [id]);
+    return await db.rawUpdate("""
+      UPDATE water SET
+        waterDrunk = ${wtr.waterDrunk},
+        dailyWater = ${wtr.dailyWater},
+        date = '${wtr.date}'
+        WHERE id = $id
+    """);
+  }
+
+  Future ClearTable(String name) async {
+    // Grabbing the database
+    Database db = await instance.database;
+
+    // Clears a table
+    return await db.execute("DELETE FROM $name");
   }
 }
 
@@ -115,16 +116,24 @@ class Water {
   final int? id;
   final int? waterDrunk;
   final int? dailyWater;
+  final String? date;
+  DateTime dateTime() => DateTime.parse(this.date!);
 
   // Class constructor
-  Water({this.id, required this.waterDrunk, required this.dailyWater});
+  Water({
+    this.id,
+    required this.waterDrunk,
+    required this.dailyWater,
+    required this.date,
+  });
 
   // We need to convert the map returned from the swl call to an
   // of type Water.
   factory Water.fromMap(Map<String, dynamic> json,) => Water(
     id: json["id"],
     waterDrunk: json["waterDrunk"],
-    dailyWater: json["dailyWater"]
+    dailyWater: json["dailyWater"],
+    date: json["date"]
   );
 
   // We use toMap() to convert an object of type Water to an
@@ -133,7 +142,8 @@ class Water {
     return {
       "id":id,
       "waterDrunk":waterDrunk,
-      "dailyWater":dailyWater
+      "dailyWater":dailyWater,
+      "date":date
     };
   }
 }
