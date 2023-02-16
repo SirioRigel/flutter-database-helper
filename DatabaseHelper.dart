@@ -78,11 +78,21 @@ class DatabaseHelper{
     return await db.delete("water", where: "id = ?", whereArgs: [id]);
   }
 
+  // Straight up deletes the table
   Future DeleteTable(String name) async{
     // Grabbing the database
     Database db = await instance.database;
     // Deletes a table with a specific name
     return await db.execute("DROP TABLE $name");
+  }
+  
+  // Clears a table eliminating all rows while maintaining the table structure intact
+  Future ClearTable(String name) async {
+    // Grabbing the database
+    Database db = await instance.database;
+
+    // Clears a table
+    return await db.execute("DELETE FROM $name");
   }
 
   // Update an object in the database
