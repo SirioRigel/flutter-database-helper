@@ -59,8 +59,8 @@ External packages used:
 
 Install them from [pub.dev] or just use:
   ```terminal
-  $ flutter pub get sqflite
-  $ flutter pub get path_provider
+  $ flutter pub add sqflite
+  $ flutter pub add path_provider
   ```
 [dependencies]: https://github.com/SirioRigel/flutter-databse-helper/tree/testBranch#dependencies
 [sqflite]: https://pub.dev/packages/sqflite
