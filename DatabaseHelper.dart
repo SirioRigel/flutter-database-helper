@@ -15,7 +15,8 @@ class DatabaseHelper{
   static Database? _database;
   Future<Database> get database async => _database ??= await InitializeDatabase();
 
-  // Creates the database using the directory of the app
+  // Creates the database using the directory of the app, you can call this each time
+  // you want to reinitialize the database
   Future<Database> InitializeDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
     String path = join(directory.path, "water.db");
@@ -28,7 +29,7 @@ class DatabaseHelper{
     );
   }
 
-  // Creates the table through a sql string
+  // Creates the table through a sql string when the database is firstly initialized
   Future CreateDatabase(Database db, int version) async {
     await db.execute('''
       CREATE TABLE water(
@@ -42,24 +43,21 @@ class DatabaseHelper{
 
   Future<List<Water>> GetWaterTable() async {
     // Grabbing the database from the constructor
-    Database db = await instance.database;
+    final db = await instance.database;
 
     // Here you can retrieve a table whose values will be converted
     // To the Water type specified in the method declaration
     // It's possible to order it through a set of commands such as
     // groupBy, orderBy, where...
-    var objects = await db.query("water", orderBy: "id");
+    final maps = await db.query("water", orderBy: "id");
 
-    // Here we map whatever object we are putting
-    // We HAVE TO use the ternary operator, otherwise if the database
-    // is empty it will return null, which we don't want.
-    List<Water>? list = objects.isNotEmpty
-      ? objects.map((e) => Water.fromMap(e)).toList()
-      : [];
-    return list;
+    // Here generate the list of objects from the list of maps
+    return List.generate(maps.length, (i) {
+      return Water.fromMap(maps[i]);
+    });
   }
 
-  // Using .toMap() to add an object into the database.
+  //Adds an object to database
   Future AddWater(Water wtr) async {
     // Grabbing the database
     Database db = await instance.database;
@@ -78,7 +76,22 @@ class DatabaseHelper{
     return await db.delete("water", where: "id = ?", whereArgs: [id]);
   }
 
-  // Straight up deletes the table
+  // Update an object in the database
+  Future<int> UpdateWater(Water wtr, int id) async {
+    // Grabbing the database
+    final db = await instance.database;
+    final map = wtr.toMap();
+
+    // Updating an object into the database at a specific index
+    return await db.update(
+      "water",
+      map,
+      where: "id = ?",
+      whereArgs: [id]
+    );
+  }
+
+  // Deletes the table
   Future DeleteTable(String name) async{
     // Grabbing the database
     Database db = await instance.database;
@@ -87,30 +100,6 @@ class DatabaseHelper{
   }
   
   // Clears a table eliminating all rows while maintaining the table structure intact
-  Future ClearTable(String name) async {
-    // Grabbing the database
-    Database db = await instance.database;
-
-    // Clears a table
-    return await db.execute("DELETE FROM $name");
-  }
-
-  // Update an object in the database
-  Future<int> UpdateWater(Water wtr, int id) async {
-    // Grabbing the database
-    Database db = await instance.database;
-
-    // We update an object calling .update and by mapping the object we
-    // updated into the database and specifying the id we want to change
-    return await db.rawUpdate("""
-      UPDATE water SET
-        waterDrunk = ${wtr.waterDrunk},
-        dailyWater = ${wtr.dailyWater},
-        date = '${wtr.date}'
-        WHERE id = $id
-    """);
-  }
-
   Future ClearTable(String name) async {
     // Grabbing the database
     Database db = await instance.database;
@@ -150,10 +139,10 @@ class Water {
   // Object which can be put into the database.
   Map<String, dynamic> toMap(){
     return {
-      "id":id,
-      "waterDrunk":waterDrunk,
-      "dailyWater":dailyWater,
-      "date":date
+      "id": id,
+      "waterDrunk": waterDrunk,
+      "dailyWater": dailyWater,
+      "date": date
     };
   }
 }
