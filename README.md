@@ -1,4 +1,4 @@
-# flutter-databse-helper
+# flutter-database-helper
 An integration of a sql database that works for flutter projects which uses a general implementation of the package `sqflite`.
 It uses also two other packages to help provide the application string to the app's folder.
 Here I have used a custom Object called Water, from one of my projects to demonstrate how to use such an object with the database.
